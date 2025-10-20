@@ -117,6 +117,27 @@ public class EstatisticaControllerTest {
     }
 
     @Test
+    @DisplayName("Inclui transação exatamente na borda da janela de 60s (filtro inclusivo)")
+    void shouldIncludeTransactionExactlyAtWindowBoundaryWhenInclusive() throws Exception {
+        // Arrange: transação exatamente 60s atrás
+        Instant naBorda = instanteFixo.minusSeconds(60);
+        transacaoRepository.save(new Transacao(new BigDecimal("100.00"), naBorda));
+
+        // Act & Assert
+        mockMvc.perform(get("/estatistica"))
+                .andExpect(status().isOk())
+                .andExpect(content().json("""
+                            {
+                                "count": 1,
+                                "sum": 100.00,
+                                "avg": 100.00,
+                                "min": 100.00,
+                                "max": 100.00
+                            }
+                        """));
+    }
+
+    @Test
     @DisplayName("Deve retornar 400 para janela com valor zero")
     void shouldReturn400ForZeroWindow() throws Exception {
         mockMvc.perform(get("/estatistica?janela=0"))

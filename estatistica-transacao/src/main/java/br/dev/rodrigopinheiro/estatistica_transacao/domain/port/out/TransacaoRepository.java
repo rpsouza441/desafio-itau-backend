@@ -9,4 +9,5 @@ public interface TransacaoRepository {
     void save(Transacao transacao);
     void deleteAll();
     List<Transacao> findSince(Instant since);
+    void deleteBefore(Instant limite);
 }
