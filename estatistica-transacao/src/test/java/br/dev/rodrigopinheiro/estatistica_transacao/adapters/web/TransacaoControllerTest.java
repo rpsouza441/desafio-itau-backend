@@ -2,6 +2,7 @@ package br.dev.rodrigopinheiro.estatistica_transacao.adapters.web;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 
@@ -125,5 +126,12 @@ public class TransacaoControllerTest {
             .andExpect(status().isBadRequest())
             .andExpect(content().string(""));
     }
-    
+
+    @Test
+    @DisplayName("Deve Retornar 200 Quando Limpar Transacoes")
+    void shouldReturn200WhenDeleteTransacoes() throws Exception {
+        mockMvc.perform(delete("/transacao"))
+            .andExpect(status().isOk())
+            .andExpect(content().string(""));
+    }
 }
