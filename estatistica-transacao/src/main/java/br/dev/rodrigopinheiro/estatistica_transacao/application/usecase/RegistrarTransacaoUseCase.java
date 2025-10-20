@@ -3,7 +3,7 @@ package br.dev.rodrigopinheiro.estatistica_transacao.application.usecase;
 
 import br.dev.rodrigopinheiro.estatistica_transacao.domain.model.Transacao;
 import br.dev.rodrigopinheiro.estatistica_transacao.domain.model.enums.ErroCode;
-import br.dev.rodrigopinheiro.estatistica_transacao.domain.port.TransacaoRepository;
+import br.dev.rodrigopinheiro.estatistica_transacao.domain.port.out.TransacaoRepository;
 import br.dev.rodrigopinheiro.estatistica_transacao.infrastructure.time.Relogio;
 
 import org.springframework.stereotype.Service;

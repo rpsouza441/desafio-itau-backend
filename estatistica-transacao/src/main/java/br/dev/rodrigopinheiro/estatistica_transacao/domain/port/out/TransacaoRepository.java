@@ -1,4 +1,4 @@
-package br.dev.rodrigopinheiro.estatistica_transacao.domain.port;
+package br.dev.rodrigopinheiro.estatistica_transacao.domain.port.out;
 
 import java.time.Instant;
 import java.util.List;

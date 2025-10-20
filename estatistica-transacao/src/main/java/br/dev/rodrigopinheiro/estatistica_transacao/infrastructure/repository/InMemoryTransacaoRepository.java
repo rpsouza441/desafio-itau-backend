@@ -7,7 +7,7 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 import org.springframework.stereotype.Repository;
 
 import br.dev.rodrigopinheiro.estatistica_transacao.domain.model.Transacao;
-import br.dev.rodrigopinheiro.estatistica_transacao.domain.port.TransacaoRepository;
+import br.dev.rodrigopinheiro.estatistica_transacao.domain.port.out.TransacaoRepository;
 
 @Repository
 public class InMemoryTransacaoRepository implements TransacaoRepository{

@@ -1,7 +1,7 @@
 package br.dev.rodrigopinheiro.estatistica_transacao.application.usecase;
 
 import br.dev.rodrigopinheiro.estatistica_transacao.application.port.in.LimparTransacoesPort;
-import br.dev.rodrigopinheiro.estatistica_transacao.domain.port.TransacaoRepository;
+import br.dev.rodrigopinheiro.estatistica_transacao.domain.port.out.TransacaoRepository;
 import org.springframework.stereotype.Service;
 
 @Service
