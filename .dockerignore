@@ -1,0 +1,52 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Maven
+estatistica-transacao/target/
+estatistica-transacao/.mvn/wrapper/maven-wrapper.jar
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+*.tmp
+*.temp
+
+# Documentation
+README.md
+*.md
+
+# Monitoring (opcional)
+monitoring/
+
+# Test reports
+estatistica-transacao/target/surefire-reports/
+estatistica-transacao/target/failsafe-reports/
+
+# Build artifacts
+*.jar
+*.war
+*.ear
+
+# Spring Boot
+estatistica-transacao/target/classes/
+estatistica-transacao/target/test-classes/
