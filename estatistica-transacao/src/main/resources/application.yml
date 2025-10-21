@@ -1,9 +1,12 @@
 spring:
   application:
     name: estatistica-transacao
-
+# Configuração para usar buckets (otimização O(1))
+app:
+  repository:
+    type: bucket  # ou "inmemory" para implementação original
 management:
   endpoints:
     web:
       exposure:
-        include: "health,metrics"
+        include: "health,metrics,buckets"

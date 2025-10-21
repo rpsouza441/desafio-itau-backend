@@ -5,6 +5,7 @@ import br.dev.rodrigopinheiro.estatistica_transacao.domain.aggregation.BigDecima
 import br.dev.rodrigopinheiro.estatistica_transacao.domain.model.Estatistica;
 import br.dev.rodrigopinheiro.estatistica_transacao.domain.model.Transacao;
 import br.dev.rodrigopinheiro.estatistica_transacao.domain.port.out.TransacaoRepository;
+import br.dev.rodrigopinheiro.estatistica_transacao.infrastructure.repository.BucketTransacaoRepository;
 import br.dev.rodrigopinheiro.estatistica_transacao.infrastructure.time.Relogio;
 
 import java.math.RoundingMode;
@@ -25,19 +26,25 @@ public class ObterEstatisticasUseCase implements ObterEstatisticasPort {
 
     @Override
     public Estatistica execute(int janelaSegundos) {
-        Instant desde = relogio.agora().minusSeconds(janelaSegundos);
+        Instant agora = relogio.agora();
+        Instant desde = agora.minusSeconds(janelaSegundos);
+        
+        // Se usando BucketTransacaoRepository, calcula diretamente
+        if (repository instanceof BucketTransacaoRepository bucketRepo) {
+            return bucketRepo.calcularEstatisticas(desde, agora);
+        }
+        
+        // Caso contrário, usa findSince e calcula manualmente
         List<Transacao> transacoes = repository.findSince(desde);
-
         BigDecimalStatistics stats = transacoes
-            .stream()
-            .collect(BigDecimalStatistics.summarizing(Transacao::valor));
+                .stream()
+                .collect(BigDecimalStatistics.summarizing(Transacao::valor));
 
         return new Estatistica(
-            stats.getCount(),
-            stats.getSum(),
-            stats.getAvg(2, RoundingMode.HALF_UP),
-            stats.getMin(),
-            stats.getMax()
-        );
+                stats.getCount(),
+                stats.getSum(),
+                stats.getAvg(2, RoundingMode.HALF_UP),
+                stats.getMin(),
+                stats.getMax());
     }
 }
