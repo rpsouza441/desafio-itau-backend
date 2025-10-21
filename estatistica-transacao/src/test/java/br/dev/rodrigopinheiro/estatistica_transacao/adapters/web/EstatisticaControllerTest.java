@@ -91,19 +91,18 @@ public class EstatisticaControllerTest {
     }
 
     @Test
-    @DisplayName("Deve Usar Janela Customizada quando fornecida")
-    void shouldReturnCorrectStatisticsWithCustomWindow() throws Exception {
-        // Transações dentro da janela de 60s
-        Instant dentro120s = instanteFixo.minusSeconds(90); // 30s atrás
+    @DisplayName("Deve usar janela configurada no application.yml (60s por padrão)")
+    void shouldUseConfiguredWindowFromApplicationYml() throws Exception {
+        // Transação dentro da janela de 60s (configurada no application.yml)
+        Instant dentro60s = instanteFixo.minusSeconds(30);
+        transacaoRepository.save(new Transacao(new BigDecimal("100.00"), dentro60s));
 
-        transacaoRepository.save(new Transacao(new BigDecimal("100.00"), dentro120s));
-
-        // Transação fora da janela (não deve ser incluída)
-        Instant fora120s = instanteFixo.minusSeconds(150);
-        transacaoRepository.save(new Transacao(new BigDecimal("999.00"), fora120s));
+        // Transação fora da janela de 60s (não deve ser incluída)
+        Instant fora60s = instanteFixo.minusSeconds(90);
+        transacaoRepository.save(new Transacao(new BigDecimal("999.00"), fora60s));
 
         // Act & Assert
-        mockMvc.perform(get("/estatistica?janela=120"))
+        mockMvc.perform(get("/estatistica"))
                 .andExpect(status().isOk())
                 .andExpect(content().json("""
                         {
@@ -137,32 +136,6 @@ public class EstatisticaControllerTest {
                         """));
     }
 
-    @Test
-    @DisplayName("Deve retornar 400 para janela com valor zero")
-    void shouldReturn400ForZeroWindow() throws Exception {
-        mockMvc.perform(get("/estatistica?janela=0"))
-                .andExpect(status().isBadRequest());
-    }
 
-    @Test
-    @DisplayName("Deve retornar 400 para janela com valor negativo")
-    void shouldReturn400ForNegativeWindow() throws Exception {
-        mockMvc.perform(get("/estatistica?janela=-30"))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    @DisplayName("Deve retornar 400 para janela maior que 3600 segundos")
-    void shouldReturn400ForWindowGreaterThan3600() throws Exception {
-        mockMvc.perform(get("/estatistica?janela=4000"))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    @DisplayName("Deve retornar 400 para janela com valor não numérico")
-    void shouldReturn400ForNonNumericWindow() throws Exception {
-        mockMvc.perform(get("/estatistica?janela=abc"))
-                .andExpect(status().isBadRequest());
-    }
 
 }

@@ -5,6 +5,7 @@ import br.dev.rodrigopinheiro.estatistica_transacao.domain.aggregation.BigDecima
 import br.dev.rodrigopinheiro.estatistica_transacao.domain.model.Estatistica;
 import br.dev.rodrigopinheiro.estatistica_transacao.domain.model.Transacao;
 import br.dev.rodrigopinheiro.estatistica_transacao.domain.port.out.TransacaoRepository;
+import br.dev.rodrigopinheiro.estatistica_transacao.infrastructure.config.EstatisticaProperties;
 import br.dev.rodrigopinheiro.estatistica_transacao.infrastructure.repository.BucketTransacaoRepository;
 import br.dev.rodrigopinheiro.estatistica_transacao.infrastructure.time.Relogio;
 
@@ -18,16 +19,18 @@ import org.springframework.stereotype.Service;
 public class ObterEstatisticasUseCase implements ObterEstatisticasPort {
     private final TransacaoRepository repository;
     private final Relogio relogio;
+    private final EstatisticaProperties estatisticaProperties;
 
-    public ObterEstatisticasUseCase(TransacaoRepository repository, Relogio relogio) {
+    public ObterEstatisticasUseCase(TransacaoRepository repository, Relogio relogio, EstatisticaProperties estatisticaProperties) {
         this.repository = repository;
         this.relogio = relogio;
+        this.estatisticaProperties = estatisticaProperties;
     }
 
     @Override
-    public Estatistica execute(int janelaSegundos) {
+    public Estatistica execute() {
         Instant agora = relogio.agora();
-        Instant desde = agora.minusSeconds(janelaSegundos);
+        Instant desde = agora.minusSeconds(estatisticaProperties.getJanelaSegundos());
         
         // Se usando BucketTransacaoRepository, calcula diretamente
         if (repository instanceof BucketTransacaoRepository bucketRepo) {

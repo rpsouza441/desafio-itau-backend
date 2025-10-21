@@ -5,6 +5,12 @@ spring:
 app:
   repository:
     type: bucket  # ou "inmemory" para implementação original
+  estatistica:
+    janela-segundos: 60  # Janela padrão para cálculo de estatísticas (60 segundos)
+    max-janela-segundos: 3600  # Janela máxima permitida (1 hora)
+  limpeza:
+    max-age-segundos: 3600  # Tempo máximo de retenção de transações (1 hora)
+    intervalo-milissegundos: 60000  # Intervalo de execução da limpeza (1 minuto)
 management:
   endpoints:
     web:
