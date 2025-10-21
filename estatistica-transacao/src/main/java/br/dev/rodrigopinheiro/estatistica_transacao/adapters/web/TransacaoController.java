@@ -8,7 +8,6 @@ import br.dev.rodrigopinheiro.estatistica_transacao.adapters.web.dto.TransacaoRe
 import br.dev.rodrigopinheiro.estatistica_transacao.adapters.web.mapper.TransacaoWebMapper;
 import br.dev.rodrigopinheiro.estatistica_transacao.application.port.in.LimparTransacoesPort;
 import br.dev.rodrigopinheiro.estatistica_transacao.application.port.in.RegistrarTransacaoPort;
-import jakarta.validation.Valid;
 
 
 @RestController
@@ -28,7 +27,7 @@ public class TransacaoController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public void registrarTransacao(@RequestBody @Valid TransacaoRequest request) {
+    public void registrarTransacao(@RequestBody TransacaoRequest request) {
         registrarTransacaoPort.execute(transacaoWebMapper.toDomain(request));
     }
 
