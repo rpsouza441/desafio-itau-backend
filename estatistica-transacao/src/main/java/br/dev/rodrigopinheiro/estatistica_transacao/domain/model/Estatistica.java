@@ -10,4 +10,7 @@ public record Estatistica(
     BigDecimal max
 ) {
     
+    public static Estatistica vazia() {
+        return new Estatistica(0, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO);
+    }
 }

@@ -5,6 +5,7 @@ import br.dev.rodrigopinheiro.estatistica_transacao.domain.aggregation.BigDecima
 import br.dev.rodrigopinheiro.estatistica_transacao.domain.model.Estatistica;
 import br.dev.rodrigopinheiro.estatistica_transacao.domain.model.Transacao;
 import br.dev.rodrigopinheiro.estatistica_transacao.domain.port.out.TransacaoRepository;
+import br.dev.rodrigopinheiro.estatistica_transacao.domain.service.EstatisticaCalculator;
 import br.dev.rodrigopinheiro.estatistica_transacao.infrastructure.config.EstatisticaProperties;
 import br.dev.rodrigopinheiro.estatistica_transacao.infrastructure.repository.BucketTransacaoRepository;
 import br.dev.rodrigopinheiro.estatistica_transacao.infrastructure.time.Relogio;
@@ -20,34 +21,21 @@ public class ObterEstatisticasUseCase implements ObterEstatisticasPort {
     private final TransacaoRepository repository;
     private final Relogio relogio;
     private final EstatisticaProperties estatisticaProperties;
+    private final EstatisticaCalculator calculator;
 
-    public ObterEstatisticasUseCase(TransacaoRepository repository, Relogio relogio, EstatisticaProperties estatisticaProperties) {
+    public ObterEstatisticasUseCase(TransacaoRepository repository, Relogio relogio,
+            EstatisticaProperties estatisticaProperties, EstatisticaCalculator calculator) {
         this.repository = repository;
         this.relogio = relogio;
         this.estatisticaProperties = estatisticaProperties;
+        this.calculator = calculator;
     }
 
     @Override
     public Estatistica execute() {
         Instant agora = relogio.agora();
         Instant desde = agora.minusSeconds(estatisticaProperties.getJanelaSegundos());
-        
-        // Se usando BucketTransacaoRepository, calcula diretamente
-        if (repository instanceof BucketTransacaoRepository bucketRepo) {
-            return bucketRepo.calcularEstatisticas(desde, agora);
-        }
-        
-        // Caso contrário, usa findSince e calcula manualmente
-        List<Transacao> transacoes = repository.findSince(desde);
-        BigDecimalStatistics stats = transacoes
-                .stream()
-                .collect(BigDecimalStatistics.summarizing(Transacao::valor));
 
-        return new Estatistica(
-                stats.getCount(),
-                stats.getSum(),
-                stats.getAvg(2, RoundingMode.HALF_UP),
-                stats.getMin(),
-                stats.getMax());
+        return calculator.calcular(repository.findSince(desde));
     }
 }
