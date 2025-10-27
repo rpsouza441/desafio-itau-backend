@@ -1,5 +1,7 @@
 package br.dev.rodrigopinheiro.estatistica_transacao.adapters.web;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,13 +23,15 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Tag(name = "Estatísticas", description = "Operações para consulta de estatísticas das transações financeiras")
 public class EstatisticaController {
 
-    private final ObterEstatisticasPort estatisticaService;
-    private final EstatisticaWebMapper mapper;
+    private static final Logger logger = LoggerFactory.getLogger(EstatisticaController.class);
 
-    public EstatisticaController(ObterEstatisticasPort estatisticaService, 
-                                EstatisticaWebMapper mapper) {
-        this.estatisticaService = estatisticaService;
-        this.mapper = mapper;
+    private final ObterEstatisticasPort obterEstatisticasPort;
+    private final EstatisticaWebMapper estatisticaWebMapper;mapper;
+
+    public EstatisticaController(ObterEstatisticasPort obterEstatisticasPort, 
+                                 EstatisticaWebMapper estatisticaWebMapper) {
+        this.obterEstatisticasPort = obterEstatisticasPort;
+        this.estatisticaWebMapper = estatisticaWebMapper;
     }
 
     @Operation(
@@ -47,8 +51,14 @@ public class EstatisticaController {
     })
     @GetMapping
     public EstatisticaResponse getEstatisticas() {
-        Estatistica estatistica = estatisticaService.execute();
-        EstatisticaResponse response = mapper.toResponse(estatistica);
+        logger.info("Iniciando consulta de estatísticas das transações");
+        
+        Estatistica estatistica = obterEstatisticasPort.execute();
+        EstatisticaResponse response = estatisticaWebMapper.toResponse(estatistica);
+        
+        logger.info("Estatísticas consultadas com sucesso - Count: {}, Sum: {}, Avg: {}, Min: {}, Max: {}", 
+                   response.count(), response.sum(), response.avg(), response.min(), response.max());
+        
         return response;
     }
     

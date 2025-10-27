@@ -1,5 +1,7 @@
 package br.dev.rodrigopinheiro.estatistica_transacao.adapters.web;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
 
@@ -7,19 +9,20 @@ import br.dev.rodrigopinheiro.estatistica_transacao.adapters.web.dto.TransacaoRe
 import br.dev.rodrigopinheiro.estatistica_transacao.adapters.web.mapper.TransacaoWebMapper;
 import br.dev.rodrigopinheiro.estatistica_transacao.application.port.in.LimparTransacoesPort;
 import br.dev.rodrigopinheiro.estatistica_transacao.application.port.in.RegistrarTransacaoPort;
+import br.dev.rodrigopinheiro.estatistica_transacao.domain.model.Transacao;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 
 @RestController
 @RequestMapping("/transacao")
 @Tag(name = "Transações", description = "Operações relacionadas ao registro e gerenciamento de transações financeiras")
 public class TransacaoController {
+
+    private static final Logger logger = LoggerFactory.getLogger(TransacaoController.class);
 
     private final RegistrarTransacaoPort registrarTransacaoPort;
     private final LimparTransacoesPort deletarTransacoesPort;
@@ -57,7 +60,14 @@ public class TransacaoController {
         @Parameter(description = "Dados da transação a ser registrada", required = true)
         @RequestBody TransacaoRequest request
     ) {
-        registrarTransacaoPort.execute(transacaoWebMapper.toDomain(request));
+        logger.info("Iniciando registro de transação - Valor: {}, DataHora: {}", 
+                   request.valor(), request.dataHora());
+        
+        Transacao transacao = transacaoWebMapper.toDomain(request);
+        registrarTransacaoPort.execute(transacao);
+        
+        logger.info("Transação registrada com sucesso - Valor: {}, DataHora: {}", 
+                   request.valor(), request.dataHora());
     }
 
     @Operation(
@@ -74,6 +84,10 @@ public class TransacaoController {
     @DeleteMapping
     @ResponseStatus(HttpStatus.OK)
     public void deletarTransacao() {
+        logger.info("Iniciando limpeza de todas as transações");
+        
         deletarTransacoesPort.execute();
+        
+        logger.info("Todas as transações foram removidas com sucesso");
     }
 }
