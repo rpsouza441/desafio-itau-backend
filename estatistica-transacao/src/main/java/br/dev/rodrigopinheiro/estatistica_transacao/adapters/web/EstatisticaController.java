@@ -26,7 +26,7 @@ public class EstatisticaController {
     private static final Logger logger = LoggerFactory.getLogger(EstatisticaController.class);
 
     private final ObterEstatisticasPort obterEstatisticasPort;
-    private final EstatisticaWebMapper estatisticaWebMapper;mapper;
+    private final EstatisticaWebMapper estatisticaWebMapper;
 
     public EstatisticaController(ObterEstatisticasPort obterEstatisticasPort, 
                                  EstatisticaWebMapper estatisticaWebMapper) {
