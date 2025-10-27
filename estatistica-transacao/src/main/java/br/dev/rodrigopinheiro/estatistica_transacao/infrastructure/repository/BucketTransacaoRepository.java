@@ -6,11 +6,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import br.dev.rodrigopinheiro.estatistica_transacao.domain.model.Estatistica;
 import br.dev.rodrigopinheiro.estatistica_transacao.domain.model.Transacao;
-import br.dev.rodrigopinheiro.estatistica_transacao.domain.port.out.TransacaoRepository;
+import br.dev.rodrigopinheiro.estatistica_transacao.domain.port.out.EstatisticaRepository;
 import br.dev.rodrigopinheiro.estatistica_transacao.infrastructure.bucket.BucketEstatistica;
 
-public class BucketTransacaoRepository implements TransacaoRepository {
+public class BucketTransacaoRepository implements EstatisticaRepository {
     private final Map<Long, BucketEstatistica> buckets = new ConcurrentHashMap<>();
 
     @Override
@@ -55,5 +56,31 @@ public class BucketTransacaoRepository implements TransacaoRepository {
 
     public int getBucketCount() {
         return buckets.size();
+    }
+
+    /**
+     * Método otimizado que calcula estatísticas diretamente dos buckets
+     * sem reconstruir objetos Transacao - muito mais rápido!
+     */
+    public Estatistica calcularEstatisticasSince(Instant since) {
+        long inicioSegundo = since.getEpochSecond();
+        long fimSegundo = Instant.now().getEpochSecond();
+
+        BucketEstatistica estatisticaFinal = new BucketEstatistica();
+
+        for (long segundo = inicioSegundo; segundo <= fimSegundo; segundo++) {
+            BucketEstatistica bucket = buckets.get(segundo);
+            if (bucket != null && !bucket.isEmpty()) {
+                estatisticaFinal.combinarCom(bucket);
+            }
+        }
+
+        return new Estatistica(
+                estatisticaFinal.getCount(),
+                estatisticaFinal.getSum(),
+                estatisticaFinal.getAvg(),
+                estatisticaFinal.getMin(),
+                estatisticaFinal.getMax()
+        );
     }
 }

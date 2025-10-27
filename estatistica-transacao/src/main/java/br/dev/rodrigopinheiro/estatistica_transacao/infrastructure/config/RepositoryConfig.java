@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
 import br.dev.rodrigopinheiro.estatistica_transacao.domain.port.out.TransacaoRepository;
+import br.dev.rodrigopinheiro.estatistica_transacao.domain.port.out.EstatisticaRepository;
 import br.dev.rodrigopinheiro.estatistica_transacao.infrastructure.repository.BucketTransacaoRepository;
 import br.dev.rodrigopinheiro.estatistica_transacao.infrastructure.repository.InMemoryTransacaoRepository;
 
@@ -15,7 +16,7 @@ public class RepositoryConfig {
     @Bean
     @Primary
     @ConditionalOnProperty(name = "app.repository.type", havingValue = "bucket", matchIfMissing = false)
-    public TransacaoRepository bucketRepository() {
+    public EstatisticaRepository bucketRepository() {
         return new BucketTransacaoRepository();
     }
 

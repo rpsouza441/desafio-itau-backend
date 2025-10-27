@@ -1,18 +1,14 @@
 package br.dev.rodrigopinheiro.estatistica_transacao.application.usecase;
 
 import br.dev.rodrigopinheiro.estatistica_transacao.application.port.in.ObterEstatisticasPort;
-import br.dev.rodrigopinheiro.estatistica_transacao.domain.aggregation.BigDecimalStatistics;
 import br.dev.rodrigopinheiro.estatistica_transacao.domain.model.Estatistica;
-import br.dev.rodrigopinheiro.estatistica_transacao.domain.model.Transacao;
 import br.dev.rodrigopinheiro.estatistica_transacao.domain.port.out.TransacaoRepository;
+import br.dev.rodrigopinheiro.estatistica_transacao.domain.port.out.EstatisticaRepository;
 import br.dev.rodrigopinheiro.estatistica_transacao.domain.service.EstatisticaCalculator;
 import br.dev.rodrigopinheiro.estatistica_transacao.infrastructure.config.EstatisticaProperties;
-import br.dev.rodrigopinheiro.estatistica_transacao.infrastructure.repository.BucketTransacaoRepository;
 import br.dev.rodrigopinheiro.estatistica_transacao.infrastructure.time.Relogio;
 
-import java.math.RoundingMode;
 import java.time.Instant;
-import java.util.List;
 
 import org.springframework.stereotype.Service;
 
@@ -36,6 +32,13 @@ public class ObterEstatisticasUseCase implements ObterEstatisticasPort {
         Instant agora = relogio.agora();
         Instant desde = agora.minusSeconds(estatisticaProperties.getJanelaSegundos());
 
-        return calculator.calcular(repository.findSince(desde));
+        // Strategy Pattern: usa método otimizado se disponível, senão usa abordagem tradicional
+        if (repository instanceof EstatisticaRepository estatisticaRepo) {
+            // Estratégia otimizada: calcula diretamente dos buckets (O(1))
+            return estatisticaRepo.calcularEstatisticasSince(desde);
+        } else {
+            // Estratégia tradicional: busca transações e calcula (O(n))
+            return calculator.calcular(repository.findSince(desde));
+        }
     }
 }
